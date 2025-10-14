@@ -1,0 +1,77 @@
+-- This SQL script inserts data into the 'books_studentprofile' table.
+-- The table structure should match the columns in your CSV file.
+-- If the table doesn't exist, you can use a CREATE TABLE statement like this:
+
+CREATE TABLE new_schema.books_studentprofile (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255),
+    sap_id BIGINT,
+    roll_no VARCHAR(255),
+    phone_no VARCHAR(20),
+    email VARCHAR(255),
+    branch_department VARCHAR(255),
+    `Password` VARCHAR(255) -- Quoted for MySQL because "Password" can be a reserved keyword
+);
+
+
+-- Use the INSERT INTO statement to add records from your CSV file.
+-- Note: The data provided has been inserted below.
+-- Each set of parentheses represents one row of data to be inserted.
+
+INSERT INTO new_schema.books_studentprofile (username, sap_id, roll_no, phone_no, email, branch_department, `Password`) VALUES
+('Girish Janani Sane', 705339482, 'L001', '9.11E+11', 'girishjananisane93@gmail.com', 'Electrical Engineering', '_@52Qeh1)(*Y'),
+('Leena Mukhopadhyay', 705341789, 'C002', '2109416838', 'leenamukhopadhyay51@gmail.com', 'Computer Science & Engineering', '_9kZo2dP&9AQ'),
+('Kai Rama', 705313785, 'V003', '9868192995', 'kairama22@gmail.com', 'Civil Engineering', '96Np+ZQf^w*$'),
+('Nachiket Anirudh Ram', 705379982, 'H004', '9687687861', 'nachiketanirudhram39@gmail.com', 'Chemical Engineering', '^#3Mp5SE!2eg'),
+('Frederick Wridesh Contractor', 705364150, 'L005', '9.12E+11', 'frederickwrideshcontractor93@gmail.com', 'Electrical Engineering', 'CPLxGaqB(r7v'),
+('Jagat Alka Dalal', 705333648, 'E006', '7481261684', 'jagatalkadalal10@gmail.com', 'Electronics & Communication', '1W3!qLiI@g9J'),
+('Gaurav Sundaram', 705383660, 'L007', '7348972072', 'gauravsundaram48@gmail.com', 'Electrical Engineering', '^6iJK8stwL_!'),
+('Saumya Widisha Ravi', 705324776, 'M008', '8588421420', 'saumyawidisharavi12@gmail.com', 'Mechanical Engineering', 'G$tD5XQp(pFC'),
+('Chakradhar Radha Mallick', 705373476, 'A009', '9461658327', 'chakradharradhamallick85@gmail.com', 'Aerospace Engineering', 'G9h8%Kii)QG+'),
+('Utkarsh Ekani Sunder', 705342517, 'M010', '9943408039', 'utkarshekanisunder47@gmail.com', 'Mechanical Engineering', 'sv2C1kGo*5Tf'),
+('Balendra Lakshit Upadhyay', 705392558, 'E011', '2923711437', 'balendralakshitupadhyay31@gmail.com', 'Electronics & Communication', '_nr1KlAJvU3c'),
+('Ishaan Sem', 705323135, 'L012', '9946591572', 'ishaansem38@gmail.com', 'Electrical Engineering', '#0hSXqTibEd+'),
+('Rajeshri Gaurang Johal', 705334091, 'E013', '4157023220', 'rajeshrigaurangjohal28@gmail.com', 'Electronics & Communication', 'f!ZrPUh!pT&2'),
+('Ansh Avi Shanker', 705360216, 'H014', '9.20E+11', 'anshavishanker99@gmail.com', 'Chemical Engineering', '*4K5hK7h)84M'),
+('Ekiya Ishani Narang', 705386789, 'A015', '9.13E+11', 'ekiyaishaninarang73@gmail.com', 'Aerospace Engineering', '9XIsLh&j@1EK'),
+('Oliver Wyatt Buch', 705393729, 'L016', '1348364405', 'oliverwyattbuch75@gmail.com', 'Electrical Engineering', 'd&P#C2S$aur8'),
+('Damyanti Diya Sibal', 705377024, 'H017', '5312000257', 'damyantidiyasibal51@gmail.com', 'Chemical Engineering', 'Rd2M%kwJ!_Rl'),
+('Banjeet Brinda Sharaf', 705363202, 'C018', '8278326784', 'banjeetbrindasharaf40@gmail.com', 'Computer Science & Engineering', 'KaSlKdrG_!S1'),
+('Oviya Banerjee', 705325317, 'E019', '5853045820', 'oviyabanerjee32@gmail.com', 'Electronics & Communication', '_N_H1Yme#8N4'),
+('Hemang Upadhyay', 705369393, 'E020', '8895233107', 'hemangupadhyay40@gmail.com', 'Electronics & Communication', '!3Qxtch@@MHI'),
+('Vasana Dalbir Mody', 705338542, 'H021', '2900632983', 'vasanadalbirmody21@gmail.com', 'Chemical Engineering', 'Gr81baCg$T59'),
+('Shivani Aarav Singhal', 705330788, 'H022', '9.12E+11', 'shivaniaaravsinghal15@gmail.com', 'Chemical Engineering', 'qt4jB(N(d&*7'),
+('Widisha Mani', 705398366, 'C023', '9.11E+11', 'widishamani65@gmail.com', 'Computer Science & Engineering', 'm74@!dPp5^FH'),
+('Sneha Varty', 705323103, 'M024', '6607043897', 'snehavarty86@gmail.com', 'Mechanical Engineering', '@d2olA1oV#pF'),
+('Oeshi Ridhi Oommen', 705337981, 'A025', '4437206618', 'oeshiridhioommen26@gmail.com', 'Aerospace Engineering', 'o(+TTk%N+aD7'),
+('Vedhika Aarna Salvi', 705396189, 'L026', '6385112953', 'vedhikaaarnasalvi53@gmail.com', 'Electrical Engineering', 'FHj4SwkAm*0l'),
+('Tarak Saraf', 705376899, 'L027', '6977996752', 'taraksaraf20@gmail.com', 'Electrical Engineering', '#B5GcCD8E+8d'),
+('Nirja Mand', 705310557, 'M028', '8040699769', 'nirjamand71@gmail.com', 'Mechanical Engineering', 'mbZTLhK2*c2!'),
+('Quincy Samaksh Chadha', 705367367, 'H029', '8310719845', 'quincysamakshchadha64@gmail.com', 'Chemical Engineering', '09W(V3RA12Rc'),
+('Jeremiah Mani', 705375150, 'M030', '1695819270', 'jeremiahmani28@gmail.com', 'Mechanical Engineering', '@KScI5Otk2XI'),
+('Vedant Libni Sankaran', 705311048, 'M031', '3749949295', 'vedantlibnisankaran26@gmail.com', 'Mechanical Engineering', 's1I2WWc&%zxI'),
+('Irya Lekha Walla', 705356686, 'C032', '992249194', 'iryalekhawalla47@gmail.com', 'Computer Science & Engineering', '@teoTx)6_h2)'),
+('Anjali Natt', 705398181, 'I033', '9369408427', 'anjalinatt77@gmail.com', 'Information Technology', 'f1EEdT1j_AKt'),
+('Aachal Omya Sarraf', 705344587, 'L034', '9831176763', 'aachalomyasarraf61@gmail.com', 'Electrical Engineering', 'KC^!OW(jJMc9'),
+('Tarak Seshadri', 705399462, 'H035', '7402573321', 'tarakseshadri76@gmail.com', 'Chemical Engineering', '#NAME?'),
+('Chakrika Krishna', 705350851, 'L036', '8303545398', 'chakrikakrishna28@gmail.com', 'Electrical Engineering', 'aZ&14D6atHwV'),
+('Oeshi Kohli', 705370286, 'A037', '9.14E+11', 'oeshikohli59@gmail.com', 'Aerospace Engineering', 'C+$0wC%meO6u'),
+('Rohan Radhika Narula', 705350894, 'I038', '4923755265', 'rohanradhikanarula62@gmail.com', 'Information Technology', 'O2jErfMUxBb%'),
+('Deepa Bera', 705331426, 'C039', '2092667931', 'deepabera23@gmail.com', 'Computer Science & Engineering', 'Q7pZ5XT%vt*!'),
+('Libni Bhandari', 705360537, 'E040', '8961914341', 'libnibhandari37@gmail.com', 'Electronics & Communication', 'rNaIOa%$D6r%'),
+('Rehaan Hemal Basak', 705374505, 'E041', '2751082', 'rehaanhemalbasak58@gmail.com', 'Electronics & Communication', 'U+(Gbf((go0S'),
+('Deepa Sarraf', 705372195, 'A042', '9881335852', 'deepasarraf97@gmail.com', 'Aerospace Engineering', '(cI(sqjz!8yZ'),
+('Jack Shanker', 705354749, 'E043', '5056459752', 'jackshanker13@gmail.com', 'Electronics & Communication', 'z&6Z5vxIJqef'),
+('Ishaan Chaitaly Hari', 705344925, 'E044', '2695981873', 'ishaanchaitalyhari55@gmail.com', 'Electronics & Communication', 'Xlo9PO^bu+%+'),
+('Jasmit Ladli Gaba', 705375841, 'L045', '9075908941', 'jasmitladligaba37@gmail.com', 'Electrical Engineering', '(U0T^dWR^#VR'),
+('Rachana Raghav Sundaram', 705355238, 'C046', '5549184733', 'rachanaraghavsundaram54@gmail.com', 'Computer Science & Engineering', 'OBw_d)J2Ax7L'),
+('Umang Sant', 705392309, 'H047', '4781163676', 'umangsant13@gmail.com', 'Chemical Engineering', 'C3a*WBDJ(j$T'),
+('Bhavini Kumar', 705368202, 'H048', '1280479494', 'bhavinikumar90@gmail.com', 'Chemical Engineering', 'j21C9sbp(JvI'),
+('Meera Praneel Bhardwaj', 705352876, 'I049', '4382589269', 'meerapraneelbhardwaj66@gmail.com', 'Information Technology', 'WS_4BQbbeh42'),
+('Vivaan Bhatti', 705361899, 'M050', '9.19E+11', 'vivaanbhatti40@gmail.com', 'Mechanical Engineering', 'RIfF3Fd!61&$');
+
+-- For different SQL databases, the quoting for the "Password" column might vary:
+-- PostgreSQL, SQL Server: "Password"
+-- MySQL: `Password`
+-- SQLite: "Password" or `Password` or [Password]
+

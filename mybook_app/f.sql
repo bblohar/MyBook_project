@@ -1,0 +1,1 @@
+SELECT username, is_staff, is_active FROM auth_user;

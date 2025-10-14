@@ -1,0 +1,17 @@
+# requirements.txt
+# This file lists the Python packages required for the Django backend.
+
+Django==4.2.0
+djangorestframework==3.14.0
+drf-yasg==1.21.4
+setuptools # Explicitly added for pkg_resources
+coreapi # IMPORTANT: This line must be present for drf-yasg schema support
+django-cors-headers # Added for CORS support
+
+# Add other packages as needed for AI/NLP later, e.g.,
+# sentence-transformers
+# faiss-cpu # or faiss-gpu
+# openai
+# spacy
+# djangorestframework-simplejwt # For token-based authentication (if needed)
+
