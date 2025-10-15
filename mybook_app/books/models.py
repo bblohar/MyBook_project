@@ -18,7 +18,6 @@ class Book(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     section = models.CharField(max_length=255, blank=True, null=True)
     category_name = models.CharField(max_length=255, blank=True, null=True)
-    
     available = models.BooleanField(default=True)
 
     def __str__(self):
@@ -26,7 +25,7 @@ class Book(models.Model):
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    sap_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    sap_id = models.CharField(max_length=20, null=True, blank=True, default='N/A')
     roll_no = models.CharField(max_length=20, blank=True, null=True)
     phone_no = models.CharField(max_length=15, blank=True, null=True)
     branch_department = models.CharField(max_length=100, blank=True, null=True)
@@ -51,7 +50,6 @@ class BookBorrow(models.Model):
     borrowed_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='BORROWED')
-    purpose = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} borrowed {self.book.title}"
@@ -68,4 +66,18 @@ class StudentQuery(models.Model):
 
     def __str__(self):
         return f"Query from {self.user.username} ({self.status})"
+
+class BookRequest(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    request_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+
+    def __str__(self):
+        return f"Request for {self.book.title} by {self.user.username}"
 
