@@ -58,7 +58,7 @@ DATABASES = {
         'NAME': 'new_schema',
         'USER': 'root',
         'PASSWORD': 'Spyrob@2909',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
