@@ -41,6 +41,19 @@ class AuthViewSet(viewsets.ViewSet):
             except IntegrityError:
                 return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# --- THIS IS THE NEW FUNCTION ---
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def check(self, request):
+        """
+        An endpoint that requires authentication.
+        If the request reaches this view, the session cookie is valid.
+        It also returns if the user is a superuser.
+        """
+        return Response({
+            'status': 'authenticated',
+            'is_superuser': request.user.is_superuser
+        }, status=status.HTTP_200_OK)
+
 
     @action(detail=False, methods=['post'])
     def login(self, request):
@@ -131,14 +144,23 @@ class AdminDashboardViewSet(viewsets.ViewSet):
 
 # --- ProfileViewSet ---
 class ProfileViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    """
+    A viewset for viewing the logged-in user's profile.
+    """
+    permission_classes = [IsAuthenticated] # Ensures only logged-in users can access this
 
     @action(detail=False, methods=['get'])
     def me(self, request):
+        # 'request.user' is the authenticated user from the session.
+        # '.profile' is the reverse link to the StudentProfile model.
+        # This is the most secure way to get the current user's profile.
         try:
-            profile = request.user.profile
+            profile = request.user.profile 
             serializer = StudentProfileSerializer(profile)
             return Response(serializer.data)
         except StudentProfile.DoesNotExist:
-            return Response({'error': 'Student profile not found. Please create one.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'error': 'Student profile not found for this user.'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 

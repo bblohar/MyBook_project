@@ -23,4 +23,3 @@ router.register(r'profile', ProfileViewSet, basename='profile')
 urlpatterns = [
     path('', include(router.urls)),
 ]
-

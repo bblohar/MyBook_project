@@ -21,16 +21,18 @@ class UserProfileBorrowSerializer(serializers.ModelSerializer):
 
 # --- StudentProfileSerializer for the /profile/me/ endpoint ---
 class StudentProfileSerializer(serializers.ModelSerializer):
+    # These fields get data from the linked 'auth_user' table
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.CharField(source='user.email', read_only=True)
-    borrowed_books = UserProfileBorrowSerializer(source='user.bookborrow_set', many=True, read_only=True)
 
     class Meta:
         model = StudentProfile
-        fields = (
-            'username', 'email', 'sap_id', 'roll_no', 'phone_no',
-            'branch_department', 'borrowed_books'
-        )
+        # These fields get data from the 'books_studentprofile' table
+        fields = [
+            'username', 'email', 'sap_id', 'roll_no', 'phone_no', 
+            'branch_department', 'role'
+        ]
+
 
 # --- CategorySerializer ---
 class CategorySerializer(serializers.ModelSerializer):
