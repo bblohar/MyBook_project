@@ -7,6 +7,8 @@ drf-yasg==1.21.4
 setuptools # Explicitly added for pkg_resources
 coreapi # IMPORTANT: This line must be present for drf-yasg schema support
 django-cors-headers # Added for CORS support
+sentence-transformers
+faiss-cpu
 
 # Add other packages as needed for AI/NLP later, e.g.,
 # sentence-transformers
