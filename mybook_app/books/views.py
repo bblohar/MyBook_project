@@ -10,14 +10,15 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from .models import Book, Category, BookBorrow, StudentQuery, StudentProfile
+from .models import Book, Category, BookBorrow, StudentQuery, StudentProfile,BookRequest
 from .serializers import (
     UserSerializer,
     CategorySerializer,
     BookSerializer,
     OverdueBookSerializer,
     StudentQuerySerializer,
-    StudentProfileSerializer
+    StudentProfileSerializer,
+    BookRequestSerializer
 )
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,19 @@ class AuthViewSet(viewsets.ViewSet):
             except IntegrityError:
                 return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# --- THIS IS THE NEW FUNCTION ---
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def check(self, request):
+        """
+        An endpoint that requires authentication.
+        If the request reaches this view, the session cookie is valid.
+        It also returns if the user is a superuser.
+        """
+        return Response({
+            'status': 'authenticated',
+            'is_superuser': request.user.is_superuser
+        }, status=status.HTTP_200_OK)
+
 
     @action(detail=False, methods=['post'])
     def login(self, request):
@@ -72,6 +86,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
+
 # --- BookViewSet ---
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
@@ -99,14 +114,25 @@ class BookViewSet(viewsets.ModelViewSet):
                 return Response({'message': 'Book is already unavailable.'}, status=status.HTTP_400_BAD_REQUEST)
             
             due_date = request.data.get('due_date')
-            purpose = request.data.get('purpose')
             if not due_date:
                 return Response({'error': 'Return date is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
             book.available = False
             book.save()
-            BookBorrow.objects.create(book=book, user=request.user, due_date=due_date, purpose=purpose)
-            return Response({'message': f'You have successfully borrowed "{book.title}".'})
+            BookBorrow.objects.create(book=book, user=request.user, due_date=due_date)
+            return Response({'message': f'You have successfully borrowed "{book.title}". Best of luck!'})
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def raise_request(self, request, pk=None):
+        try:
+            book = self.get_object()
+            if BookRequest.objects.filter(book=book, user=request.user, status='PENDING').exists():
+                return Response({'message': 'You have already requested this book.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            BookRequest.objects.create(book=book, user=request.user)
+            return Response({'message': f'Your request for "{book.title}" has been raised successfully. Best of luck!'})
         except Book.DoesNotExist:
             return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -127,6 +153,33 @@ class AdminDashboardViewSet(viewsets.ViewSet):
         pending_queries = StudentQuery.objects.filter(status='PENDING')
         serializer = StudentQuerySerializer(pending_queries, many=True)
         return Response(serializer.data)
+        
+    @action(detail=False, methods=['get'])
+    def pending_requests(self, request):
+        requests = BookRequest.objects.filter(status='PENDING').order_by('-request_date')
+        serializer = BookRequestSerializer(requests, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], url_path='update-request-status/(?P<request_id>[0-9]+)')
+    def update_request_status(self, request, pk=None, request_id=None):
+        try:
+            book_request = BookRequest.objects.get(id=request_id)
+            new_status = request.data.get('status')
+            
+            if new_status not in ['APPROVED', 'REJECTED']:
+                return Response({'error': 'Invalid status provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            book_request.status = new_status
+            book_request.save()
+            
+            # If approved, make the book available again
+            if new_status == 'APPROVED':
+                book_request.book.available = True
+                book_request.book.save()
+
+            return Response({'message': f'Request has been {new_status.lower()}.'})
+        except BookRequest.DoesNotExist:
+            return Response({'error': 'Request not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # --- ProfileViewSet ---
@@ -136,9 +189,15 @@ class ProfileViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def me(self, request):
         try:
-            profile = request.user.profile
+            profile, created = StudentProfile.objects.get_or_create(user=request.user)
+            if created:
+                logger.info(f"Created a new profile for user: {request.user.username}")
             serializer = StudentProfileSerializer(profile)
             return Response(serializer.data)
-        except StudentProfile.DoesNotExist:
-            return Response({'error': 'Student profile not found. Please create one.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Error fetching profile for user {request.user.username}: {e}")
+            return Response(
+                {'error': 'An internal server error occurred while fetching the profile.'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
