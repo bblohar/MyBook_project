@@ -55,9 +55,13 @@ WSGI_APPLICATION = 'mybook_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_schema',
+        'NAME': 'akshaydb1',
         'USER': 'root',
+<<<<<<< HEAD
+        'PASSWORD': 'Akshay@123',
+=======
         'PASSWORD': 'Spyrob@2909',
+>>>>>>> f0276963392403a59c306f945bd6310c671830ce
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
