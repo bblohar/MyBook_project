@@ -1156,6 +1156,10 @@
                         <p><strong>Email:</strong> ${profile.email}</p>
                         <p><strong>SAP ID:</strong> ${profile.sap_id || 'Not provided'}</p> 
                         <p><strong>Phone No.:</strong> ${profile.phone_no || 'Not provided'}</p>
+                        <p><strong>Department:</strong> ${profile.department || 'Not provided'}</p>
+                        <p><strong>Count of Borrowed Books:</strong> ${profile.borrowed_books ? profile.borrowed_books.length : 0}</p>
+                        <p><strong>Count of Requested Books:</strong> ${profile.requested_books ? profile.requested_books.length : 0}</p>
+
                     </div>
                     ${borrowedBooksHtml}
                     ${requestedBooksHtml}
@@ -1240,7 +1244,24 @@
         }
 
         function renderAboutPage() {
-            contentDiv.innerHTML = `<br> </br><h2 class="text-3xl font-bold mb-6">About MyBook</h2><div class="prose max-w-none"><p>MyBook is an AI-driven web application to simplify finding and accessing books. We leverage cutting-edge AI and NLP technologies for a personalized and efficient book discovery journey.</p></div>`;
+            contentDiv.innerHTML = `<br> </br><h2 class="text-3xl font-bold mb-6">About MyBook</h2><div class="prose max-w-none"><p>
+Welcome to "my book," a digital platform designed for the modern reader. Our mission is to provide an intuitive, powerful, and secure tool for you to manage, explore, and enjoy your personal book collection.
+
+We believe managing your library should be a seamless and enjoyable experience. That's why "my book" is built as a modern web application, offering a fast, responsive, and app-like interface that lets you browse and search your collection without constant page reloads.
+
+Our Technology
+For the tech-savvy, "my book" is built using a robust and modern technology stack designed for security and performance.
+
+Frontend: The dynamic and interactive user interface is crafted with foundational web technologies (HTML, CSS, and JavaScript) to create a fluid Single Page Application (SPA).
+
+Backend: Our powerful backend API is built with Python and the acclaimed Django REST Framework. It handles all business logic and ensures that data is processed efficiently and securely.
+
+Database: User authentication and core data are managed using a reliable MySQL database, ensuring data integrity and persistence.
+
+A Commitment to Security
+Your security is our top priority. We leverage Django's battle-tested, "batteries-included" security model to provide a strong defense against common web vulnerabilities, including SQL Injection, Cross-Site Scripting (XSS), and Cross-Site Request Forgery (CSRF). We are committed to following industry best practices to ensure your digital library is safe and sound.
+
+The "my book" project is a journey of continuous improvement. We are dedicated to refining our architecture to ensure scalability, performance, and discoverability, delivering the best possible experience for book lovers everywhere.</p></div>`;
         }
 
         async function renderBooksPage(params = {}) {
