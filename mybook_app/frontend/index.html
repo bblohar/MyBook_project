@@ -1060,12 +1060,13 @@
             contentDiv.innerHTML = `
                 <div class="text-center py-12">
                     <h1 class="text-4xl font-extrabold mb-4 animate-fade-in-down" style="color: var(--text-color);">Welcome to MyBook !</h1>
-                    <p class="text-lg mb-8 animate-fade-in-up" style="color: var(--text-color);">Your ultimate destination for discovering and accessing books.</p>
+                    <p class="text-lg mb-8 animate-fade-in-up" style="color: #3b82f6 ;">Your ultimate destination for discovering and accessing books.</p>
                     <div class="flex justify-center items-center mb-8">
                         <input type="text" id="homeSearchInput" placeholder="Search for books by title or author..."
+                        style="--tw-bg-opacity: 1; background-color: rgba(255, 255, 255, var(--tw-bg-opacity)); border: 1px solid var(--card-border); color: black;"
                                class="form-input p-3 border rounded-l-lg w-full max-w-md focus:ring-2 focus:ring-indigo-500 animate-slide-in-left">
                         <button id="homeSearchBtn"
-                                class="btn-primary p-3 rounded-r-lg text-white font-semibold animate-slide-in-right" style="background-color: var(--btn-rent-bg);">
+                                class="btn-primary p-3 rounded-r-lg text-black font-semibold animate-slide-in-right" style="background-color: var(--btn-rent-bg);">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
                     </div>
@@ -1602,7 +1603,7 @@ function renderAdminUpdationPage() {
                 const response = await apiRequest(`${API_BASE_URL}auth/login/`, 'POST', { username, password });
                 
                 localStorage.setItem('authToken', 'fake-user-token'); // Using mock token
-                showMessage('Login successful!');
+                showMessage('<br> </by> Login successful!');
                 updateAuthLinks();
                 navigate('home');
             } catch (error) {
@@ -1708,7 +1709,7 @@ function renderAdminUpdationPage() {
             showLoader();
             try {
                 const response = await apiRequest(`${API_BASE_URL}books/${bookId}/raise_request/`, 'POST');
-                showMessage(response.message || 'Request raised successfully!');
+                showMessage(response.message || '<br> </br>Request raised successfully!');
                 closeModal('requestModal');
                 handleRouting(); // Refresh page
             } catch (error) {

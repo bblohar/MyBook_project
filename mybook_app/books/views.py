@@ -38,9 +38,9 @@ class AuthViewSet(viewsets.ViewSet):
                     password=serializer.validated_data['password']
                 )
                 StudentProfile.objects.create(user=user)
-                return Response({'message': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
+                return Response({'<br> </br> message': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
             except IntegrityError:
-                return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'<br> </br> error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # --- THIS IS THE NEW FUNCTION ---
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
@@ -66,7 +66,7 @@ class AuthViewSet(viewsets.ViewSet):
             login(request, user)
             logger.info(f"User '{username}' logged in successfully.")
             return Response({
-                'message': 'Login successful.',
+                'message': '<br> </br> Login successful.',
                 'is_staff': user.is_superuser # Use is_superuser as requested
             }, status=status.HTTP_200_OK)
         else:
@@ -76,7 +76,7 @@ class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
         logout(request)
-        return Response({'message': 'Logout successful.'}, status=status.HTTP_200_OK)
+        return Response({'<br> </br> message': 'Logout successful.'}, status=status.HTTP_200_OK)
 
 
 # --- CategoryViewSet ---
@@ -111,7 +111,7 @@ class BookViewSet(viewsets.ModelViewSet):
         try:
             book = self.get_object()
             if not book.available:
-                return Response({'message': 'Book is already unavailable.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'<br> </br> message': 'Book is already unavailable.'}, status=status.HTTP_400_BAD_REQUEST)
             
             due_date = request.data.get('due_date')
             if not due_date:
@@ -120,7 +120,7 @@ class BookViewSet(viewsets.ModelViewSet):
             book.available = False
             book.save()
             BookBorrow.objects.create(book=book, user=request.user, due_date=due_date)
-            return Response({'message': f'You have successfully borrowed "{book.title}". Best of luck!'})
+            return Response({'<br> </br> message': f'You have successfully borrowed "{book.title}". Best of luck!'})
         except Book.DoesNotExist:
             return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -129,10 +129,10 @@ class BookViewSet(viewsets.ModelViewSet):
         try:
             book = self.get_object()
             if BookRequest.objects.filter(book=book, user=request.user, status='PENDING').exists():
-                return Response({'message': 'You have already requested this book.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'<br> </br> message': 'You have already requested this book.'}, status=status.HTTP_400_BAD_REQUEST)
 
             BookRequest.objects.create(book=book, user=request.user)
-            return Response({'message': f'Your request for "{book.title}" has been raised successfully. Best of luck!'})
+            return Response({'<br> </br> message': f'Your request for "{book.title}" has been raised successfully. Best of luck!'})
         except Book.DoesNotExist:
             return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -177,7 +177,7 @@ class AdminDashboardViewSet(viewsets.ViewSet):
                 book_request.book.available = True
                 book_request.book.save()
 
-            return Response({'message': f'Request has been {new_status.lower()}.'})
+            return Response({'<br> </br> message': f'Request has been {new_status.lower()}.'})
         except BookRequest.DoesNotExist:
             return Response({'error': 'Request not found.'}, status=status.HTTP_404_NOT_FOUND)
 
