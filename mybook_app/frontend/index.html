@@ -772,7 +772,7 @@
         <div class="loader-spinner"></div>
     </div>
 
-    <div id="authPageContainer" class="min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('https://engineering-shirpur.nmims.edu/wp-content/webp-express/webp-images/uploads/2025/04/IMAGE-OF-NEWSLETTER.png.webp'); background-size: cover; background-position: center; height: 500px;">;
+    <div id="authPageContainer" class="min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('https://shirpur.nmims.edu/wp-content/uploads/2025/06/DJI_0259-A-2048x1536.jpg'); background-size: cover; background-position: center; height: 500px;">;
         </div>
 
     <div id="appContainer" class="hidden flex flex-col min-h-screen">
@@ -1290,7 +1290,6 @@ The "my book" project is a journey of continuous improvement. We are dedicated t
                     apiRequest(`${API_BASE_URL}admin-dashboard/pending_requests/`)
                 ]);
 
-                // Render Book Requests
                 const requestsHtml = `
                     <div class="mb-8">
                         <h3 class="text-2xl font-semibold mb-4" style="color: var(--text-color);">Pending Book Requests</h3>
@@ -1343,7 +1342,7 @@ The "my book" project is a journey of continuous improvement. We are dedicated t
             }
         }
 
-        function renderAdminDashboardPage() { adminContentDiv.innerHTML = `<h2 class="text-3xl font-bold mb-6">Dashboard</h2><iframe title="PRAJAKTA" width="100%" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiZTFlY2Y0YzAtMTM0MS00MjU3LTgwNGMtYmZhMjBhM2MyODQyIiwidCI6ImQxZjE0MzQ4LWYxYjUtNGEwOS1hYzk5LTdlYmYyMTNjYmM4MSIsImMiOjEwfQ%3D%3D&pageName=a434691000dffcdce1e2" frameborder="0" allowFullScreen="true"></iframe>`;}
+        function renderAdminDashboardPage() { adminContentDiv.innerHTML = `<h2 class="text-3xl font-bold mb-6">Dashboard</h2><iframe title="mybook" width="100%" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiOThhODcwMDYtZjI2Ny00NWI0LTlkZTQtYjkxNDY4OTk3ODkwIiwidCI6ImQxZjE0MzQ4LWYxYjUtNGEwOS1hYzk5LTdlYmYyMTNjYmM4MSIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>`;}
 function renderAdminUpdationPage() {
             adminContentDiv.innerHTML = `
                 <div class="flex justify-between items-center mb-4">
@@ -1354,7 +1353,7 @@ function renderAdminUpdationPage() {
                 </div>
 
                 <div class="mb-6 flex items-center">
-                    <input type="text" id="adminSearchInput" placeholder="Search by title or author..." 
+                    <input type="text" id="adminSearchInput" placeholder="Search by title or author..." style="--tw-bg-opacity: 1; background-color: rgba(255, 255, 255, var(--tw-bg-opacity)); border: 1px solid var(--card-border); color: black;"
                            class="form-input p-2 border rounded-l-lg w-full max-w-sm" 
                            onkeypress="if(event.key === 'Enter') triggerAdminSearch()">
                     <button onclick="triggerAdminSearch()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold p-2 rounded-r-lg">
