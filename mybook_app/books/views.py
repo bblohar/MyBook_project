@@ -4,11 +4,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.db.models import Q
+from django.db import models  # <-- ADDED THIS IMPORT
 from django.utils import timezone
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+
+#AI Imports
+import os
+import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 from .models import Book, Category, BookBorrow, StudentQuery, StudentProfile,BookRequest
 from .serializers import (
@@ -22,6 +29,29 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+# --- AI MODEL AND INDEX LOADING ---
+MODEL_NAME = 'all-MiniLM-L6-v2'
+INDEX_FILE_PATH = 'book_index.faiss'
+
+MODEL = None
+INDEX = None
+
+try:
+    logger.info("Loading SentenceTransformer model...")
+    MODEL = SentenceTransformer(MODEL_NAME)
+    logger.info("Model loaded successfully.")
+
+    if os.path.exists(INDEX_FILE_PATH):
+        logger.info("Loading FAISS index...")
+        INDEX = faiss.read_index(INDEX_FILE_PATH)
+        logger.info("FAISS index loaded successfully.")
+    else:
+        logger.error(f"FAISS index file not found at: {INDEX_FILE_PATH}")
+
+except Exception as e:
+    logger.error(f"Error loading AI model or index: {e}")
+
 
 # --- AuthViewSet ---
 class AuthViewSet(viewsets.ViewSet):
@@ -42,7 +72,7 @@ class AuthViewSet(viewsets.ViewSet):
             except IntegrityError:
                 return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# --- THIS IS THE NEW FUNCTION ---
+
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def check(self, request):
         """
@@ -122,7 +152,7 @@ class BookViewSet(viewsets.ModelViewSet):
             BookBorrow.objects.create(book=book, user=request.user, due_date=due_date)
             return Response({'message': f'You have successfully borrowed "{book.title}". Best of luck!'})
         except Book.DoesNotExist:
-            return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Book not found.'}, status=status.HTTP_4D_NOT_FOUND)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def raise_request(self, request, pk=None):
@@ -135,6 +165,47 @@ class BookViewSet(viewsets.ModelViewSet):
             return Response({'message': f'Your request for "{book.title}" has been raised successfully. Best of luck!'})
         except Book.DoesNotExist:
             return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # --- THIS IS THE NEW CHAT ACTION ---
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def chat(self, request):
+        user_query = request.data.get('message', '')
+        if not user_query:
+            return Response({'reply': 'Please ask a question.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if MODEL is None or INDEX is None:
+            logger.error("Chatbot: Model or Index not loaded.")
+            return Response({'reply': 'Sorry, the AI search is currently offline.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        try:
+            # 1. Convert user query to a vector
+            query_vector = MODEL.encode([user_query])
+            
+            # 2. Search the FAISS index (k=3 means find top 3 matches)
+            distances, indices = INDEX.search(query_vector, k=3)
+            
+            # 3. Get the Book IDs from the search results
+            # We filter out any -1s which mean no match
+            book_ids = [idx for idx in indices[0] if idx != -1]
+            
+            if not book_ids:
+                return Response({'reply': "I couldn't find any books that match your request. Try rephrasing your question."})
+
+            # 4. Fetch the matching books from your MySQL database
+            # We use a trick to keep them in the order FAISS gave us
+            preserved_order = models.Case(*[models.When(id=pk, then=pos) for pos, pk in enumerate(book_ids)])
+            matched_books = Book.objects.filter(id__in=book_ids).order_by(preserved_order)
+
+            # 5. Build a friendly response
+            response_text = "Based on your request, I found these books for you:\n\n"
+            for book in matched_books:
+                response_text += f"• **{book.title}** by {book.author}\n (Location: {book.location or 'N/A'})\n\n"
+            
+            return Response({'reply': response_text})
+
+        except Exception as e:
+            logger.error(f"Error during AI chat search: {e}")
+            return Response({'reply': 'Sorry, I ran into an error trying to find books for you.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # --- AdminDashboardViewSet ---
@@ -179,7 +250,7 @@ class AdminDashboardViewSet(viewsets.ViewSet):
 
             return Response({'message': f'Request has been {new_status.lower()}.'})
         except BookRequest.DoesNotExist:
-            return Response({'error': 'Request not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Request not found.'}, status=status.HTTP_44_NOT_FOUND)
 
 
 # --- ProfileViewSet ---
@@ -200,4 +271,3 @@ class ProfileViewSet(viewsets.ViewSet):
                 {'error': 'An internal server error occurred while fetching the profile.'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-

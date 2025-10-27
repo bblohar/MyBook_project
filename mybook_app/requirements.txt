@@ -9,6 +9,7 @@ coreapi # IMPORTANT: This line must be present for drf-yasg schema support
 django-cors-headers # Added for CORS support
 sentence-transformers
 faiss-cpu
+scikit-surprise
 
 # Add other packages as needed for AI/NLP later, e.g.,
 # sentence-transformers

@@ -728,6 +728,19 @@
     color: #e5e7eb;
 }
 
+/* */
+.user-message {
+    background-color: #dbeafe; /* Tailwind blue-100 */
+    color: #1e40af; /* Tailwind blue-800 */
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+body.dark-theme .user-message {
+    background-color: #1e3a8a; /* Tailwind blue-900 */
+    color: #dbeafe; /* Tailwind blue-100 */
+}
+/* */
+
 #chatbot-input-container {
     display: flex;
     padding: 10px;
@@ -798,7 +811,6 @@
             </ul>
         </nav>
 
-        <!-- MODAL FOR BORROWING A BOOK -->
         <div id="borrowModal" class="modal">
             <div class="modal-content">
                 <span class="close-button" onclick="closeModal('borrowModal')">&times;</span>
@@ -826,7 +838,6 @@
             </div>
         </div>
 
-        <!-- MODAL FOR RAISING A REQUEST -->
         <div id="requestModal" class="modal">
             <div class="modal-content">
                 <span class="close-button" onclick="closeModal('requestModal')">&times;</span>
@@ -918,6 +929,15 @@
         const adminDashboardContainer = document.getElementById('adminDashboardContainer');
         const fullScreenLoader = document.getElementById('fullScreenLoader');
 
+        // --- UPDATED --- Added all chatbot variables here
+        const chatbotWindow = document.getElementById('chatbot-window');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatbotFab = document.getElementById('chatbot-fab');
+        const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+        // --- END UPDATED ---
+
         // Storage for recently viewed books
         const RECENTLY_VIEWED_KEY = 'mybook_recently_viewed';
         const MAX_RECENTLY_VIEWED = 5;
@@ -1001,8 +1021,8 @@
                     throw new Error(errorMessage);
                 }
                  if (response.status === 204) { 
-                    return null;
-                }
+                     return null;
+                 }
                 return await response.json();
             } catch (error) {
                 console.error('API Request Error:', error.message);
@@ -1040,6 +1060,71 @@
             const text = isDark ? ' Dark' : ' Light';
             if (themeBtnDesktop) themeBtnDesktop.innerHTML = icon + text;
         }
+
+        // --- ADDED --- New Chatbot function
+        /**
+         * Adds a message to the chatbot window
+         * @param {string} message - The text of the message
+         * @param {string} sender - 'bot' or 'user'
+         */
+        function addChatMessage(message, sender = 'bot') {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message');
+            
+            if (sender === 'user') {
+                messageDiv.classList.add('user-message');
+                messageDiv.textContent = message;
+            } else {
+                messageDiv.classList.add('bot-message');
+                messageDiv.innerHTML = message; // Use .innerHTML to render bold/links
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            // Scroll to the bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // --- ADDED --- New Chatbot function
+        /**
+         * Handles sending a chat message to the API
+         */
+        async function handleChatSend() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Display user's message immediately
+            addChatMessage(message, 'user');
+            chatInput.value = ''; // Clear the input
+
+            try {
+                // Show a typing indicator
+                addChatMessage('<i>Thinking...</i>', 'bot');
+
+                // Call our new API endpoint: /api/books/chat/
+                const response = await apiRequest(`${API_BASE_URL}books/chat/`, 'POST', { message: message });
+                
+                // Remove the "Thinking..." message
+                chatMessages.removeChild(chatMessages.lastChild);
+
+                // Display the bot's real reply
+                // Replace \n with <br> for HTML
+                const replyHtml = response.reply.replace(/\n/g, '<br>');
+                addChatMessage(replyHtml, 'bot');
+
+            } catch (error) {
+                // Remove the "Thinking..." message
+                if (chatMessages.lastChild) {
+                    chatMessages.removeChild(chatMessages.lastChild);
+                }
+                
+                let errorMsg = `Sorry, I ran into an error: ${error.message}`;
+                if (error.message.includes('401') || error.message.includes('403')) {
+                    errorMsg = "Sorry, you must be logged in to use the chatbot.";
+                }
+                addChatMessage(errorMsg, 'bot');
+            }
+        }
+
 
         // --- Page Rendering Functions ---
         async function renderHomePage() {
@@ -1205,33 +1290,13 @@
             }
         }
 
-        let hasWelcomed = false;
+        // --- UPDATED --- Simplified this function
         function toggleChatbot() {
-            const chatbotWindow = document.getElementById('chatbot-window');
             if (chatbotWindow) {
                 chatbotWindow.classList.toggle('active');
-                if (chatbotWindow.classList.contains('active') && !hasWelcomed) {
-                    showWelcomeMessage(); hasWelcomed = true;
-                }
             }
         }
-        function showWelcomeMessage() {
-            const messagesContainer = document.getElementById('chat-messages');
-            if (!messagesContainer) return;
-            const welcomeMessage = "Hello! How can I help you find a book today?";
-            let i = 0;
-            const botMessageElement = document.createElement('div');
-            botMessageElement.className = 'chat-message bot-message';
-            messagesContainer.appendChild(botMessageElement);
-            function typeWriter() {
-                if (i < welcomeMessage.length) {
-                    botMessageElement.innerHTML += welcomeMessage.charAt(i); i++;
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    setTimeout(typeWriter, 40);
-                }
-            }
-            setTimeout(typeWriter, 500);
-        }
+        // --- UPDATED --- Removed the old showWelcomeMessage() function.
 
         async function renderCategoriesPage() {
             contentDiv.innerHTML = `<br> <br><h2 class="text-3xl font-bold mb-6">Book Categories</h2><div id="categoryList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>`;
@@ -1398,9 +1463,7 @@ function renderAdminUpdationPage() {
             `;
             loadBooksForAdmin();
         }
-        // ADD these new functions below renderAdminUpdationPage
-        // REPLACE your existing loadBooksForAdmin function
-// REPLACE your existing loadBooksForAdmin function
+        
         async function loadBooksForAdmin(searchTerm = '') {
             const bookListDiv = document.getElementById('adminBookList');
             bookListDiv.innerHTML = `<p>Loading books...</p>`;
@@ -1446,18 +1509,11 @@ function renderAdminUpdationPage() {
             }
         }
 
-        // ADD this new helper function
         function triggerAdminSearch() {
             const searchTerm = document.getElementById('adminSearchInput').value;
             loadBooksForAdmin(searchTerm);
         }
 
-        // ADD this new helper function
-        function triggerAdminSearch() {
-            const searchTerm = document.getElementById('adminSearchInput').value;
-            loadBooksForAdmin(searchTerm);
-        }
-// REPLACE your existing showBookForm function
         async function showBookForm(bookId = null) {
             const modal = document.getElementById('bookModal');
             const form = document.getElementById('bookForm');
@@ -1476,7 +1532,6 @@ function renderAdminUpdationPage() {
                     document.getElementById('category_name').value = book.category_name;
                     document.getElementById('section').value = book.section;
                     document.getElementById('location').value = book.location;
-                    // ✅ POPULATE the hidden available field
                     document.getElementById('bookAvailable').value = book.available;
                 } catch (error) {
                     showMessage('Could not fetch book details.', 'error');
@@ -1485,13 +1540,11 @@ function renderAdminUpdationPage() {
             } else {
                 // Adding a new book
                 formTitle.textContent = 'Add New Book';
-                // ✅ SET default availability for new books
                 document.getElementById('bookAvailable').value = true;
             }
             modal.style.display = 'block';
         }
 
-        // REPLACE your existing saveBook function
         async function saveBook() {
             const bookId = document.getElementById('bookId').value;
             const bookData = {
@@ -1500,17 +1553,14 @@ function renderAdminUpdationPage() {
                 category_name: document.getElementById('category_name').value,
                 section: document.getElementById('section').value,
                 location: document.getElementById('location').value,
-                // ✅ INCLUDE the 'available' field in the data sent to the API
                 available: document.getElementById('bookAvailable').value,
             };
 
             try {
                 if (bookId) {
-                    // Update existing book
                     await apiRequest(`${API_BASE_URL}books/${bookId}/`, 'PUT', bookData);
                     showMessage('Book updated successfully!');
                 } else {
-                    // Create new book
                     await apiRequest(`${API_BASE_URL}books/`, 'POST', bookData);
                     showMessage('Book added successfully!');
                 }
@@ -1593,6 +1643,7 @@ function renderAdminUpdationPage() {
         }
 
         // --- Auth Handlers ---
+        // --- UPDATED --- This now uses the REAL API for login, not the mock token
         async function handleLogin(event) {
             event.preventDefault();
             showLoader();
@@ -1601,12 +1652,13 @@ function renderAdminUpdationPage() {
                 const password = event.target.loginPassword.value;
                 const response = await apiRequest(`${API_BASE_URL}auth/login/`, 'POST', { username, password });
                 
-                localStorage.setItem('authToken', 'fake-user-token'); // Using mock token
-                showMessage('Login successful!');
+                // Use a generic flag, not a real token
+                localStorage.setItem('authToken', 'user-logged-in'); 
+                showMessage(response.message || 'Login successful!');
                 updateAuthLinks();
                 navigate('home');
             } catch (error) {
-                showMessage(`Login failed.`, 'error');
+                // apiRequest function already shows the error message
             } finally {
                 hideLoader();
             }
@@ -1620,7 +1672,7 @@ function renderAdminUpdationPage() {
                 const password = event.target.adminLoginPassword.value;
                 const response = await apiRequest(`${API_BASE_URL}auth/login/`, 'POST', { username, password });
                 if (response.is_staff) {
-                    localStorage.setItem('authToken', 'fake-admin-token');
+                    localStorage.setItem('authToken', 'admin-logged-in'); // Use generic flag
                     localStorage.setItem('isAdmin', 'true');
                     showMessage('Admin login successful!');
                     navigate('admin-home');
@@ -1628,7 +1680,7 @@ function renderAdminUpdationPage() {
                     showMessage('You do not have admin permissions.', 'error');
                 }
             } catch (error) {
-                showMessage(`Login failed.`, 'error');
+                // apiRequest function already shows the error message
             } finally {
                 hideLoader();
             }
@@ -1697,7 +1749,7 @@ function renderAdminUpdationPage() {
                 closeModal('borrowModal');
                 handleRouting(); // Refresh page
             } catch (error) {
-                showMessage('Borrow request failed.', 'error');
+                // apiRequest already shows the error
             } finally {
                 hideLoader();
             }
@@ -1712,7 +1764,7 @@ function renderAdminUpdationPage() {
                 closeModal('requestModal');
                 handleRouting(); // Refresh page
             } catch (error) {
-                 // The error message from the API is already shown by apiRequest
+                 // apiRequest already shows the error
             } finally {
                 hideLoader();
             }
@@ -1789,12 +1841,17 @@ function renderAdminUpdationPage() {
 
 
         // --- Initial Load ---
+        // --- UPDATED --- This whole block is updated with the new listeners
         window.addEventListener('hashchange', handleRouting);
         window.addEventListener('load', () => {
             handleRouting();
             updateAuthLinks();
+            
+            // Theme button
             const themeBtnDesktop = document.getElementById('themeToggleBtn');
             if (themeBtnDesktop) themeBtnDesktop.addEventListener('click', toggleTheme);
+            
+            // Theme loading logic
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-theme');
@@ -1802,10 +1859,24 @@ function renderAdminUpdationPage() {
             } else {
                 updateThemeButtons(false);
             }
-            const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
-            if (chatbotCloseBtn) chatbotCloseBtn.addEventListener('click', toggleChatbot);
+
+            // --- CHATBOT LISTENERS ---
+            // Listener for the close 'X' button
+            if (chatbotCloseBtn) {
+                chatbotCloseBtn.addEventListener('click', toggleChatbot);
+            }
+            
+            // New listeners for sending messages
+            chatSendBtn.addEventListener('click', handleChatSend);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleChatSend();
+                }
+            });
+            
+            // New welcome message
+            addChatMessage("Hi! I'm your MyBook Assistant. Ask me to find books for you, like 'books about space' or 'a history of AI'.", 'bot');
         });
     </script>
 </body>
 </html>
-

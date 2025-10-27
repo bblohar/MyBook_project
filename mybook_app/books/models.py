@@ -19,13 +19,10 @@ class Book(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     section = models.CharField(max_length=255, blank=True, null=True)
     category_name = models.CharField(max_length=255, blank=True, null=True)
-<<<<<<< HEAD
-    
+
     # Your existing description column (it's good that it's already here!)
     description = models.TextField(blank=True, null=True) 
     
-=======
->>>>>>> f0276963392403a59c306f945bd6310c671830ce
     available = models.BooleanField(default=True)
     
     # This is the new line you must add:
